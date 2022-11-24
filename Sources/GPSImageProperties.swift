@@ -104,7 +104,7 @@ extension GPSImageProperties: ImageProperties {
     return kCGImagePropertyGPSDictionary
   }
 
-  public var cfValues: CFValues {
+  public var values: CFValues {
     [
       $version,
       $status,
@@ -139,7 +139,7 @@ extension GPSImageProperties: ImageProperties {
     ].rawCfValues()
   }
 
-  public init(_ cfValues: RawCFValues) {
+  public init(_ cfValues: CFRawValues) {
     _version.assign(from: cfValues)
     _status.assign(from: cfValues)
     _latitudeRef.assign(from: cfValues)

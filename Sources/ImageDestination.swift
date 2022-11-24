@@ -19,7 +19,7 @@ public final class ImageDestination {
   }
 
   public init?(dataConsumer: CGDataConsumer, imageType: UTITypeConvertible, imageCount: Int, options: Properties? = nil) {
-    guard let imageDestination = CGImageDestinationCreateWithDataConsumer(dataConsumer, imageType.UTI.cfType, imageCount, options?.rawCFValues())
+    guard let imageDestination = CGImageDestinationCreateWithDataConsumer(dataConsumer, imageType.UTI.cfType, imageCount, options?.rawValues())
       else { return nil }
     self.imageDestination = imageDestination
   }
@@ -35,11 +35,11 @@ public final class ImageDestination {
 // MARK: - Adding Images
 public extension ImageDestination {
   func addImage(_ image: CGImage, properties: Properties? = nil) {
-    CGImageDestinationAddImage(imageDestination, image, properties?.rawCFValues())
+    CGImageDestinationAddImage(imageDestination, image, properties?.rawValues())
   }
   
   func addImage(from source: ImageSource, sourceImageIndex: Int, properties: Properties? = nil) {
-    CGImageDestinationAddImageFromSource(imageDestination, source.imageSource, sourceImageIndex, properties?.rawCFValues())
+    CGImageDestinationAddImageFromSource(imageDestination, source.imageSource, sourceImageIndex, properties?.rawValues())
   }
 }
 
@@ -61,7 +61,7 @@ public extension ImageDestination {
 // MARK: - Settings Properties
 public extension ImageDestination {
   func setProperties(_ properties: Properties?) {
-    CGImageDestinationSetProperties(imageDestination, properties?.rawCFValues())
+    CGImageDestinationSetProperties(imageDestination, properties?.rawValues())
   }
 }
 
@@ -73,13 +73,15 @@ public extension ImageDestination {
 }
 
 extension ImageDestination.Properties: CFValuesRepresentable {
-  public var cfValues: CFValues {
-    var result: CFValues = [
-      kCGImageDestinationLossyCompressionQuality: lossyCompressionQuality,
-      kCGImageDestinationBackgroundColor: backgroundColor,
-    ]
-    imageProperties?.merge(into: &result)
-    return result
-  }
+    
+    public var values: CFValues {
+        var result: CFValues = [
+            kCGImageDestinationLossyCompressionQuality: lossyCompressionQuality,
+            kCGImageDestinationBackgroundColor: backgroundColor,
+        ]
+        imageProperties?.merge(into: &result)
+        return result
+    }
+    
 }
 

@@ -90,14 +90,14 @@
       return kCGImagePropertyGIFDictionary
     }
 
-    public var cfValues: CFValues {
+    public var values: CFValues {
       return [
         kCGImagePropertyGIFLoopCount: loopCount,
         kCGImagePropertyGIFHasGlobalColorMap: hasGlobalColorMap,
       ]
     }
 
-    public init(_ cfValues: RawCFValues) {
+    public init(_ cfValues: CFRawValues) {
       if let loopCount = cfValues[kCGImagePropertyGIFLoopCount] as? NSNumber {
         self.loopCount = loopCount.intValue
       }
@@ -113,7 +113,7 @@ extension GIF.FrameProperties: ImageProperties {
     return kCGImagePropertyGIFDictionary
   }
 
-  public var cfValues: CFValues {
+  public var values: CFValues {
     return [
       kCGImagePropertyGIFDelayTime: delayTime,
       kCGImagePropertyGIFImageColorMap: imageColorMap,
@@ -121,7 +121,7 @@ extension GIF.FrameProperties: ImageProperties {
     ]
   }
 
-  public init(_ cfValues: RawCFValues) {
+  public init(_ cfValues: CFRawValues) {
     if let delayTime = cfValues[kCGImagePropertyGIFDelayTime] as? NSNumber {
       self.delayTime = delayTime.doubleValue
     }

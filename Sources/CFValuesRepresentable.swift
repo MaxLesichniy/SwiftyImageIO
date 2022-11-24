@@ -1,17 +1,17 @@
 import Foundation
 
 public protocol CFValuesRepresentable {
-  var cfValues: CFValues { get }
+    var values: CFValues { get }
 }
 
 internal extension CFValuesRepresentable {
-  func rawCFValues() -> CFDictionary {
-    var result: [CFString: AnyObject] = [:]
-
-    for (imageIOKey, value) in cfValues {
-      result[imageIOKey] = value?.cfValue
+    func rawValues() -> CFDictionary {
+        var result: [CFString: AnyObject] = [:]
+        
+        for (imageIOKey, value) in values {
+            result[imageIOKey] = value?.cfValue
+        }
+        
+        return result as CFDictionary
     }
-
-    return result as CFDictionary
-  }
 }

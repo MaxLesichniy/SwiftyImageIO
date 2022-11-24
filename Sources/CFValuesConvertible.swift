@@ -1,5 +1,5 @@
 import Foundation
 
 public protocol CFValuesConvertible {
-  init(_ cfValues: RawCFValues)
+  init(_ cfValues: CFRawValues)
 }

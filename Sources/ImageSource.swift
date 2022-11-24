@@ -1,5 +1,6 @@
 import Foundation
 import ImageIO
+import UniformTypeIdentifiers
 
 /** ImageSource objects, available in OS X v10.4 or later and iOS 4.0 and later, abstract the data-reading task. An image source can read image data from a URL, a CFData object, or a data consumer.
 
@@ -20,7 +21,7 @@ public class ImageSource {
    - seealso: `CGImageSourceCreateWithURL`
    */
   public init?(url: URL, options: Options?) {
-    guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, options?.rawCFValues()) else { return nil }
+    guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, options?.rawValues()) else { return nil }
     self.imageSource = imageSource
   }
   
@@ -34,7 +35,7 @@ public class ImageSource {
    - seealso: `CGImageSourceCreateWithData`
    */
   public init?(data: Data, options: Options?) {
-    guard let imageSource = CGImageSourceCreateWithData(data as CFData, options?.rawCFValues()) else { return nil }
+    guard let imageSource = CGImageSourceCreateWithData(data as CFData, options?.rawValues()) else { return nil }
     self.imageSource = imageSource
   }
   
@@ -58,7 +59,7 @@ public class ImageSource {
    - returns: An `ImageSource` or nil, if `ImageSource` cannot be created for whatever reason.
    */
   public init?(dataProvider:CGDataProvider, options: Options?) {
-    guard let imageSource = CGImageSourceCreateWithDataProvider(dataProvider, options?.rawCFValues()) else { return nil }
+    guard let imageSource = CGImageSourceCreateWithDataProvider(dataProvider, options?.rawValues()) else { return nil }
     self.imageSource = imageSource;
   }
   
@@ -116,7 +117,7 @@ public extension ImageSource {
 
    */
   func createImage(atIndex index: Int = 0, options: Options? = nil) -> CGImage? {
-    return CGImageSourceCreateImageAtIndex(imageSource, index, options?.rawCFValues())
+    return CGImageSourceCreateImageAtIndex(imageSource, index, options?.rawValues())
   }
   
   /**
@@ -129,7 +130,7 @@ public extension ImageSource {
    - seealso: `CGImageSourceCreateThumbnailAtIndex`
    */
   func createThumbnail(atIndex index: Int = 0, options: Options? = nil) -> CGImage? {
-    return CGImageSourceCreateThumbnailAtIndex(imageSource, index, options?.rawCFValues())
+    return CGImageSourceCreateThumbnailAtIndex(imageSource, index, options?.rawValues())
   }
   
   /**
@@ -141,7 +142,7 @@ public extension ImageSource {
    - seealso: `CGImageSourceCreateIncremental`
    */
   static func makeIncremental(_ options: Options? = nil) -> IncrementalImageSource {
-    return IncrementalImageSource(imageSource: CGImageSourceCreateIncremental(options?.rawCFValues()))
+    return IncrementalImageSource(imageSource: CGImageSourceCreateIncremental(options?.rawValues()))
   }
 }
 
@@ -183,16 +184,22 @@ public extension IncrementalImageSource {
 
 // MARK: - Getting Information From an Image Source
 public extension ImageSource {
-  /// The uniform type identifier of the source container.
-  /// - seealso: `CGImageSourceGetType`
-  var UTI: SwiftyImageIO.UTI? {
-    if let type =  CGImageSourceGetType(imageSource) {
-      return SwiftyImageIO.UTI(type)
+    /// The uniform type identifier of the source container.
+    /// - seealso: `CGImageSourceGetType`
+    var UTI: SwiftyImageIO.UTI? {
+        if let type =  CGImageSourceGetType(imageSource) {
+            return SwiftyImageIO.UTI(type)
+        }
+        return nil
     }
-    else {
-      return nil
+    
+    @available(iOS 14.0, iOSApplicationExtension 14.0, *)
+    var type: UTType? {
+        if let type = CGImageSourceGetType(imageSource) {
+            return UTType(type as String)
+        }
+        return nil
     }
-  }
   
   /// Returns the Core Foundation type ID for the image source.
   /// - seealso: `CGImageSourceGetTypeID`
@@ -226,8 +233,8 @@ public extension ImageSource {
    - seealso: [CGImageProperties Reference](https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/CGImageProperties_Reference/) for a list of properties that can be in the dictionary.
    */
   func properties(_ options: Options? = nil) -> ImagePropertiesContainer? {
-    guard let rawProperties = CGImageSourceCopyProperties(imageSource, options?.rawCFValues()) else { return nil }
-    guard let rawCFValues = (rawProperties as? RawCFValues) else { return nil }
+    guard let rawProperties = CGImageSourceCopyProperties(imageSource, options?.rawValues()) else { return nil }
+    guard let rawCFValues = (rawProperties as? CFRawValues) else { return nil }
     return ImagePropertiesContainer(rawCFValues)
   }
   
@@ -245,15 +252,15 @@ public extension ImageSource {
    - todo: Return wrapper around `CFImageProperties`
    */
   func propertiesForImage(atIndex index: Int = 0, options: Options? = nil) -> ImagePropertiesContainer? {
-    guard let rawProperties =  CGImageSourceCopyPropertiesAtIndex(imageSource, index, options?.rawCFValues())
+    guard let rawProperties =  CGImageSourceCopyPropertiesAtIndex(imageSource, index, options?.rawValues())
       else { return nil }
-    guard let rawCFValues = rawProperties as? RawCFValues else { return nil}
+    guard let rawCFValues = rawProperties as? CFRawValues else { return nil}
     return ImagePropertiesContainer(rawCFValues)
   }
 }
 
 extension ImageSource.Options: CFValuesRepresentable {
-  public var cfValues: CFValues {
+  public var values: CFValues {
     return [
       kCGImageSourceTypeIdentifierHint: typeIdentifierHint,
       kCGImageSourceShouldAllowFloat: shouldAllowFloat,

@@ -1,5 +1,5 @@
 import Foundation
 
 public typealias CFValues = [CFString: CFValueConvertible?]
-public typealias RawCFValues = [CFString: AnyObject]
+public typealias CFRawValues = [CFString: AnyObject]
 
